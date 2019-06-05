@@ -26,4 +26,4 @@ var taco = {
 };
 
 // Export the database functions for the controller (tacoya_controller.js).
-module.exports = tacos;
+module.exports = taco;
