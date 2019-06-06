@@ -1,29 +1,32 @@
-// Import ORM to initialize functions that utilize mySQL tacoya_db database
-var orm = require("../config/orm");
+// Import the ORM
+var orm = require('../config/orm.js');
 
 var taco = {
-  all: function(cb) {
-    orm.selectAll("tacos", function(res) {
-      cb(res);
-    });
-  },
-  // The variables cols and vals are arrays.
-  insert: function(cols, vals, cb) {
-    orm.insertOne("tacos", cols, vals, function(res) {
-      cb(res);
-    });
-  },
-  update: function(colValObj, id, cb) {
-    orm.updateOne("tacos", colValObj, id, function(res) {
-      cb(res);
-    });
-  },
-  delete: function(id, cb) {
-    orm.delete("tacos", id, function(res) {
-      cb(res);
-    });
-  }
+    updateAll: function (cb) {
+        orm.updateAll('tacos', function (res) {
+
+            //Callback
+            cb(res);
+        });
+    },
+
+    insertTaco: function (cols, vals, cb) {
+
+        orm.insertTaco('tacos', cols, vals, function (res) {
+
+            cb(res);
+        });
+    },
+    updateTaco: function (obj, condition, cb) {
+
+        // Update Taco With ORM
+        orm.updateTaco('tacos', obj, condition, function (res) {
+
+            //Callback
+            cb(res);
+        });
+    }
 };
 
-// Export the database functions for the controller (tacoya_controller.js).
+// Export to controller
 module.exports = taco;
