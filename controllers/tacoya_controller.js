@@ -9,7 +9,7 @@ var taco = require("../models/tacoya");
 
 // Create all our routes and set up logic within those routes where required.
 router.get("/", function (req, res) {
-    taco.all(function (data) {
+    taco.updateAll(function (data) {
         var hbsObject = {
             taco: data
         };
@@ -18,21 +18,22 @@ router.get("/", function (req, res) {
     });
 });
 
-router.post("/tacos", function (req, res) {
-    taco.insert(["taco_name"], [req.body.taco_name], function (result) {
+router.post("/api/tacos", function (req, res) {
+    taco.insertTaco(["taco_name", "picked_up"], [req.body.taco_name, req.body.picked_up], function (data) {
         res.json({
-            id: result.insertId
+            id: data.insertId
         });
     });
 });
 
-router.put("/tacos/:id", function (req, res) {
-    var id = "id = " + req.params.id;
+router.put("/api/tacos/:id", function (req, res) {
+    var condition = "id = " + req.params.id;
 
-    taco.update({
+    taco.updateTaco(
+        {
         picked_up: req.body.picked_up
-    }, 
-    id, function (result) {
+        }, 
+    condition, function (result) {
         if (result.changedRows == 0) {
             // If no rows were changed, then the ID must not exist, so 404
             return res.status(404).end();
@@ -42,10 +43,10 @@ router.put("/tacos/:id", function (req, res) {
     });
 });
 
-router.delete("/tacos/:id", function (req, res) {
-    var id = "id = " + req.params.id;
+router.delete("/api/tacos/:id", function (req, res) {
+    var condition = "id = " + req.params.id;
 
-    taco.delete(id, function (result) {
+    taco.deleteTaco(condition, function (result) {
         if (result.affectedRows == 0) {
             // If no rows were changed, then the ID must not exist, so 404
             return res.status(404).end();

@@ -1,7 +1,7 @@
 // Require mySQL connection.js file
 var connection = require("./connection");
 
-function printQuestionMarks(num) {
+function printQuestions(num) {
     var arr = [];
 
     for (var i = 0; i < num; i++) {
@@ -12,70 +12,87 @@ function printQuestionMarks(num) {
 }
 
 // Helper function to convert object key/value pairs to SQL syntax
-function objToSql(ob) {
-    var arr = [];
 
+function sqlobject(ob) {
+    var arr = [];
+    
     // loop through the keys and push the key/value as a string int arr
-    for (var key in ob) {
+        for (var key in ob) {
         var value = ob[key];
         // check to skip hidden properties
         if (Object.hasOwnProperty.call(ob, key)) {
-            if (typeof value === "string" && value.indexOf(" ") >= 0) {
-                value = "'" + value + "'";
-            }
-            arr.push(key + "=" + value);
+        if (typeof value === 'string' && value.indexOf(' ') >= 0) {
+            value = "'" + value + "'";
         }
+        arr.push(key + '=' + value);
     }
+  }
 
-    return arr.toString();
+  return arr.toString();
 }
 
 // Object for all our SQL statement functions.
 var orm = {
-    selectAll: function(tableInput, cb) {
-      //construct the query string that returns all rows from the table
-      var queryString = "SELECT * FROM " + tableInput + ";";
-      connection.query(queryString, function(err, result) {
+    updateAll: function(table, cb) {
+      var query = 'SELECT * FROM ' + table + ';';
+      connection.query(query, [table], function(err, res) {
         if (err) {
+          console.log(err);
           throw err;
         }
-        cb(result);
+        console.log(res);
+        cb(res);
       });
     },
-    insertOne: function(table, cols, vals, cb) {
-      var queryString = "INSERT INTO " + table + " (" + cols.toString() + ") VALUES (" + printQuestionMarks(vals.length) +  ");"
-
-      connection.query(queryString, vals, function(err, result) {
+    insertTaco: function(table, cols, vals, cb) {
+      var query = 'INSERT INTO ' + table;
+      query += ' (';
+      query += cols.toString();
+      query += ') ';
+      query += 'VALUES (';
+      query += printQuestions(vals.length);
+      query += ') ';
+  
+      connection.query(query, vals, function(err, res) {
         if (err) {
+          console.log(err);
           throw err;
         }
-        cb(result);
+        cb(res);
       });
     },
-    
-    updateOne: function(table, colValObj, id, cb) {
-      var queryString = "UPDATE " + table + " SET " + objToSql(colValObj) + " WHERE " + id
-
-      connection.query(queryString, function(err, result) {
+    updateTaco: function(table, obj, condition, cb) {
+      var query = 'UPDATE ' + table;
+      query += ' SET ';
+      query += sqlobject(obj);
+      query += ' WHERE ';
+      query += condition;
+      
+      connection.query(query, function(err, res) {
         if (err) {
+          console.log(err);
           throw err;
         }
-  
-        cb(result);
+        cb(res);
       });
     },
-    delete: function(table, id, cb) {
-      var queryString = "DELETE FROM " + table + " WHERE " + id
-  
-      connection.query(queryString, function(err, result) {
-        if (err) {
-          throw err;
-        }
-  
-        cb(result);
-      });
+    deleteTaco: function(table, obj, condition, cb) {
+        var query = 'DELETE ' + table;
+        query += ' SET ';
+        query += sqlobject(obj);
+        query += ' WHERE ';
+        query += condition;
+        
+        connection.query(query, function(err, res) {
+          if (err) {
+            console.log(err);
+            throw err;
+          }
+          cb(res);
+        });
     }
-};
+    
+  };
   
   // Export the orm object for the model (orm.js).
   module.exports = orm;
